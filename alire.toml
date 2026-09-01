@@ -1,6 +1,6 @@
 name = "flyology_crc"
 description = "Fast CRC-16, CRC-32, and CRC-64 algorithms for Ada"
-version = "0.1.0"
+version = "0.1.1"
 
 licenses = "MIT OR Apache-2.0"
 authors = ["Yurii Rashkovskii"]
