@@ -1,6 +1,7 @@
 with Ada.Streams;
 with Ada.Text_IO;
 with CRC_Fast_Oracle;
+with Flyology_CRC.Native;
 with Flyology_CRC.Native_Features;
 with Flyology_CRC.Width_32;
 
@@ -111,9 +112,7 @@ package body Flyology_CRC.CRC32C_PMULL_V12E_V1.Tests is
 
    procedure Run is
    begin
-      if not Native_Features.PMULL_Available
-        or else not Native_Features.CRC32_Available
-      then
+      if not Native.Compiled then
          declare
             Empty : Byte_Array renames Test_Data (Test_Data'First .. Test_Data'First - 1);
             One   : Byte_Array renames Test_Data (Test_Data'First .. Test_Data'First);
@@ -139,6 +138,12 @@ package body Flyology_CRC.CRC32C_PMULL_V12E_V1.Tests is
          end if;
          Ada.Text_IO.Put_Line
            ("CRC32C PMULL v12e_v1 scalar stub fails closed as required");
+         return;
+      elsif not Native_Features.PMULL_Available
+        or else not Native_Features.CRC32_Available
+      then
+         Ada.Text_IO.Put_Line
+           ("CRC32C PMULL v12e_v1 tests skipped: CRC32+PMULL unavailable");
          return;
       end if;
 
