@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: >-
+    flyology-crc-ci-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  generated-and-documentation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: alire-project/setup-alire@fc4c8ce471aa30b3af0d39ce15add1ee9eaf28f2 # v6.0.0
+      - name: Select verified Ada toolchain
+        run: alr toolchain --select gnat_native=16.1.0 gprbuild=26.0.1
+      - name: Verify generated catalogue
+        run: python3 tools/generate_catalogue.py --check
+      - name: Install GNATdoc
+        run: alr install --prefix=.alire/gnatdoc gnatdoc_bin=26.0.0
+      - name: Require complete public API documentation
+        run: tools/generate_docs.sh
+
+  platform-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            architecture: scalar
+            host_os: linux
+          - runner: ubuntu-24.04
+            architecture: x86_64
+            host_os: linux
+          - runner: ubuntu-24.04-arm
+            architecture: aarch64
+            host_os: linux
+          - runner: macos-14
+            architecture: aarch64
+            host_os: macos
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: alire-project/setup-alire@fc4c8ce471aa30b3af0d39ce15add1ee9eaf28f2 # v6.0.0
+      - name: Select verified Ada toolchain
+        run: alr toolchain --select gnat_native=16.1.0 gprbuild=26.0.1
+      - name: Record Rust toolchain
+        run: rustc --version && cargo --version
+      - name: Test and build locked Rust oracle
+        working-directory: oracle/rust
+        run: |
+          cargo test --release --locked
+          cargo_output=$(cargo rustc --release --locked -- --print native-static-libs 2>&1)
+          printf '%s\n' "$cargo_output"
+          native_libraries=$(
+            printf '%s\n' "$cargo_output" |
+              sed -n 's/^note: native-static-libs: //p' |
+              tail -n 1
+          )
+          if [ -z "$native_libraries" ]; then
+            printf '%s\n' "Cargo did not report native static-library dependencies." >&2
+            exit 1
+          fi
+          printf '%s\n' \
+            "FLYOLOGY_CRC_ORACLE_SYSTEM_LIBRARIES=$native_libraries" \
+            >> "$GITHUB_ENV"
+      - name: Build release library
+        run: >-
+          alr build --release --
+          -XFLYOLOGY_CRC_ARCH=${{ matrix.architecture }}
+          -XFLYOLOGY_CRC_HOST_OS=${{ matrix.host_os }}
+      - name: Build release tests
+        working-directory: tests
+        run: >-
+          alr build --release --
+          -XFLYOLOGY_CRC_ARCH=${{ matrix.architecture }}
+          -XFLYOLOGY_CRC_HOST_OS=${{ matrix.host_os }}
+      - name: Run complete test suite
+        run: >-
+          python3 tools/run_tests.py
+          tests/bin/${{ matrix.architecture }}/${{ matrix.host_os }}

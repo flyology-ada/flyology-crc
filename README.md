@@ -46,6 +46,10 @@ combine, and custom-parameter tests. Its second executable links a locked Rust
 static library and compares all algorithms directly with the pinned oracle over
 boundary-sized deterministic inputs.
 
+GitHub Actions builds and runs every declared test executable on Linux x86-64,
+the scalar fallback, Linux ARM64, and macOS ARM64. It also verifies generated
+catalogue sources and requires warning-free public GNATdocs.
+
 The nested `benchmarks` crate uses `flyology_bench` for paired, balanced
 comparisons. The Rust oracle must be built in release mode before building the
 Rust-linked tests or benchmarks:
