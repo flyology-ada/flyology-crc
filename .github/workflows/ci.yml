@@ -75,12 +75,14 @@ jobs:
           alr build --release --
           -XFLYOLOGY_CRC_ARCH=${{ matrix.architecture }}
           -XFLYOLOGY_CRC_HOST_OS=${{ matrix.host_os }}
+          -cargs:Ada -gnatwe
       - name: Build release tests
         working-directory: tests
         run: >-
           alr build --release --
           -XFLYOLOGY_CRC_ARCH=${{ matrix.architecture }}
           -XFLYOLOGY_CRC_HOST_OS=${{ matrix.host_os }}
+          -cargs:Ada -gnatwe
       - name: Run complete test suite
         run: >-
           python3 tools/run_tests.py
