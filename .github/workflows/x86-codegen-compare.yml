@@ -61,13 +61,45 @@ jobs:
           object=flyology_crc-crc32c_x86_avx512_vpclmul_v3x2.o
           test -s "base/obj/x86_64/linux/$object"
           test -s "candidate/obj/x86_64/linux/$object"
-          sha256sum \
-            "base/obj/x86_64/linux/$object" \
-            "candidate/obj/x86_64/linux/$object"
-          cmp \
-            "base/obj/x86_64/linux/$object" \
-            "candidate/obj/x86_64/linux/$object"
+          cp "base/obj/x86_64/linux/$object" base-object.o
+          cp "candidate/obj/x86_64/linux/$object" candidate-object.o
 
           alr -C candidate build --release -- \
             -f -XFLYOLOGY_CRC_ARCH=x86_64 -XFLYOLOGY_CRC_HOST_OS=linux \
             -cargs:Ada -gnatwe
+
+          sha256sum base-object.o candidate-object.o
+
+          for side in base candidate; do
+            readelf --wide --section-headers "$side-object.o" \
+              > "$side-sections.txt"
+            readelf --wide --symbols "$side-object.o" |
+              awk 'NF == 8 && $1 ~ /^[0-9]+:$/ && $4 != "FILE" { print $2, $3, $4, $5, $6, $7, $8 }' \
+                > "$side-symbols.txt"
+            objdump -drwC "$side-object.o" |
+              tail -n +3 > "$side-disassembly.txt"
+          done
+          diff -u base-sections.txt candidate-sections.txt || true
+          diff -u base-symbols.txt candidate-symbols.txt || true
+          diff -u base-disassembly.txt candidate-disassembly.txt || true
+
+          for section in .text .rela.text .data .rodata .eh_frame .rela.eh_frame; do
+            section_name=${section#.}
+            objcopy --dump-section "$section=base-$section_name.bin" \
+              base-object.o
+            objcopy --dump-section "$section=candidate-$section_name.bin" \
+              candidate-object.o
+            test -s "base-$section_name.bin"
+            test -s "candidate-$section_name.bin"
+            sha256sum "base-$section_name.bin" "candidate-$section_name.bin"
+            cmp "base-$section_name.bin" "candidate-$section_name.bin"
+          done
+
+          test -s base-symbols.txt
+          test -s candidate-symbols.txt
+          test -s base-disassembly.txt
+          test -s candidate-disassembly.txt
+          sha256sum base-symbols.txt candidate-symbols.txt
+          sha256sum base-disassembly.txt candidate-disassembly.txt
+          cmp base-symbols.txt candidate-symbols.txt
+          cmp base-disassembly.txt candidate-disassembly.txt
