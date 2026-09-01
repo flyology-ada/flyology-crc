@@ -49,13 +49,13 @@ jobs:
 
           alr -C base build --release -- \
             -f -XFLYOLOGY_CRC_ARCH=x86_64 -XFLYOLOGY_CRC_HOST_OS=linux \
-            -cargs:Ada -gnatwa 2>&1 | tee base-build.log
+            2>&1 | tee base-build.log
           test "$(grep -c 'code statement with no inputs should usually be Volatile' base-build.log)" -eq 1
           test "$(grep -c 'warning:' base-build.log)" -eq 1
 
           alr -C candidate build --release -- \
             -f -XFLYOLOGY_CRC_ARCH=x86_64 -XFLYOLOGY_CRC_HOST_OS=linux \
-            -cargs:Ada -gnatwa 2>&1 | tee candidate-build.log
+            2>&1 | tee candidate-build.log
           test "$(grep -c 'warning:' candidate-build.log || true)" -eq 0
 
           object=flyology_crc-crc32c_x86_avx512_vpclmul_v3x2.o
@@ -70,4 +70,4 @@ jobs:
 
           alr -C candidate build --release -- \
             -f -XFLYOLOGY_CRC_ARCH=x86_64 -XFLYOLOGY_CRC_HOST_OS=linux \
-            -cargs:Ada -gnatwa -gnatwe
+            -cargs:Ada -gnatwe
