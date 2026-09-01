@@ -101,8 +101,7 @@ package body Flyology_CRC.CRC32C_X86_AVX512_VPCLMUL_V3X2 is
          Outputs =>
            [U32'Asm_Output ("+&r", CRC),
             System.Address'Asm_Output ("+&r", Pointer)],
-         Clobber  => "cc,memory",
-         Volatile => True);
+         Clobber => "cc,memory", Volatile => True);
    end CRC32C_64_Byte_Block;
    pragma Inline_Always (CRC32C_64_Byte_Block);
 
