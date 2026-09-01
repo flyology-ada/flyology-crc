@@ -1,0 +1,120 @@
+project Flyology_Crc is
+   type Architecture_Kind is ("scalar", "aarch64", "x86_64");
+   Architecture : Architecture_Kind :=
+     external ("FLYOLOGY_CRC_ARCH", "scalar");
+
+   type Host_OS_Kind is ("macos", "linux", "unsupported");
+   Host_OS : Host_OS_Kind :=
+     external ("FLYOLOGY_CRC_HOST_OS", "unsupported");
+
+   Backend_Directory := "src/backends/scalar";
+   case Architecture is
+      when "aarch64" =>
+         Backend_Directory := "src/backends/aarch64";
+      when "x86_64" =>
+         Backend_Directory := "src/backends/x86_64";
+      when "scalar" =>
+         null;
+   end case;
+
+   Platform_Directory := "src/platform/unsupported";
+   case Architecture is
+      when "aarch64" =>
+         case Host_OS is
+            when "macos" =>
+               Platform_Directory := "src/platform/macos";
+            when "linux" =>
+               Platform_Directory := "src/platform/linux";
+            when "unsupported" =>
+               null;
+         end case;
+      when "scalar" | "x86_64" =>
+         null;
+   end case;
+
+   for Source_Dirs use
+     ("src", "src/generated", "src/native", Backend_Directory,
+      Platform_Directory);
+   for Object_Dir use "obj/" & Architecture & "/" & Host_OS;
+   for Library_Name use "flyology_crc";
+   for Library_Kind use "static";
+   for Library_Dir use "lib/" & Architecture & "/" & Host_OS;
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      Common_Ada :=
+        ("-O2", "-gnat2022", "-gnatwa", "-gnatwJ", "-gnatVa",
+         "-gnatyM110");
+      for Default_Switches ("Ada") use Common_Ada;
+
+      case Architecture is
+         when "aarch64" =>
+            --  Only these selected leaves may contain optional AArch64
+            --  instructions.  Runtime feature gates remain compiled for
+            --  baseline AArch64.
+            for Switches ("flyology_crc-crc32_aarch64_small.adb") use
+              Common_Ada & ("-O3", "-march=armv8-a+crc");
+            for Switches ("flyology_crc-native.adb") use
+              Common_Ada & ("-O3", "-march=armv8-a+aes");
+            for Switches ("flyology_crc-native_eor3.adb") use
+              Common_Ada & ("-O3", "-march=armv8-a+aes+sha3");
+            for Switches ("flyology_crc-crc32_iso_hdlc_pmull_v12e_v1.adb") use
+              Common_Ada & ("-O3", "-march=armv8-a+aes+crc");
+            for Switches ("flyology_crc-crc32_iso_hdlc_pmull_eor3_v9s3x2e_s3.adb") use
+              Common_Ada & ("-O3", "-march=armv8-a+aes+crc+sha3");
+            for Switches ("flyology_crc-crc32c_pmull_v12e_v1.adb") use
+              Common_Ada & ("-O3", "-march=armv8-a+aes+crc");
+            for Switches ("flyology_crc-crc32c_pmull_eor3_v9s3x2e_s3.adb") use
+              Common_Ada & ("-O3", "-march=armv8-a+aes+crc+sha3");
+         when "x86_64" =>
+            --  Runtime detection must remain valid on the x86-64 baseline.
+            --  Optional instructions belong only in selected leaves below.
+            for Switches ("flyology_crc-x86_features.adb") use
+              Common_Ada &
+                ("-march=x86-64", "-mno-avx", "-mno-avx2", "-mno-avx512f");
+            for Switches ("flyology_crc-crc32c_x86_small.adb") use
+              Common_Ada &
+                ("-O3", "-march=x86-64", "-msse4.2", "-mno-avx",
+                 "-mno-avx2", "-mno-avx512f");
+            for Switches ("flyology_crc-crc32c_x86_sse_v4s3x3.adb") use
+              Common_Ada &
+                ("-O3", "-march=x86-64", "-msse4.2", "-mpclmul",
+                 "-mno-avx", "-mno-avx2", "-mno-avx512f");
+            for Switches ("flyology_crc-generic_sse.adb") use
+              Common_Ada &
+                ("-O3", "-march=x86-64", "-mssse3", "-msse4.1",
+                 "-mpclmul", "-mno-avx", "-mno-avx2", "-mno-avx512f");
+            for Switches ("flyology_crc-generic_avx512_ternary.adb") use
+              Common_Ada &
+                ("-O3", "-march=x86-64", "-mssse3", "-msse4.1",
+                 "-mpclmul", "-mavx512f", "-mavx512vl");
+            for Switches ("flyology_crc-generic_avx512_vpclmul.adb") use
+              Common_Ada &
+                ("-O3", "-march=x86-64", "-mssse3", "-msse4.1",
+                 "-mpclmul", "-mavx512f", "-mavx512vl", "-mavx512bw",
+                 "-mvpclmulqdq");
+            for Switches
+              ("flyology_crc-crc32c_x86_avx512_pclmul_v4s3x3.adb") use
+              Common_Ada &
+                ("-O3", "-march=x86-64", "-msse4.2", "-mpclmul",
+                 "-mavx512f", "-mavx512vl");
+            for Switches
+              ("flyology_crc-crc32c_x86_avx512_vpclmul_v3x2.adb") use
+              Common_Ada &
+                ("-O3", "-march=x86-64", "-msse4.2", "-mavx512f",
+                 "-mavx512vl", "-mvpclmulqdq");
+         when "scalar" =>
+            null;
+      end case;
+   end Compiler;
+
+   package Format is
+      for Width ("Ada") use "110";
+      for Indentation ("Ada") use "3";
+      for Indentation_Continuation ("Ada") use "2";
+      for Indentation_Kind ("Ada") use "spaces";
+      for End_Of_Line ("Ada") use "lf";
+      for Charset ("Ada") use "utf-8";
+   end Format;
+
+end Flyology_Crc;

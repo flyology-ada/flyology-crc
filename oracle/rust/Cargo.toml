@@ -1,0 +1,17 @@
+[package]
+name = "flyology-crc-fast-oracle"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+crc-fast = { git = "https://github.com/awesomized/crc-fast-rust", rev = "3a853cc7daf2cd47cc4466f198680cabdfb0b5fa" }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"

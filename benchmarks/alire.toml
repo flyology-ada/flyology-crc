@@ -1,0 +1,17 @@
+name = "flyology_crc_benchmarks"
+description = "Performance comparisons for flyology_crc"
+version = "0.1.0-dev"
+licenses = "MIT OR Apache-2.0"
+executables = ["flyology_crc_comparison"]
+
+[[depends-on]]
+gnat = ">=13 & <17"
+
+[[depends-on]]
+flyology_bench = "=0.1.1-dev"
+
+[[depends-on]]
+flyology_crc = "*"
+
+[[pins]]
+flyology_crc = { path = ".." }

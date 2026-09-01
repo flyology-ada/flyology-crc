@@ -1,0 +1,10 @@
+name: flyology_crc-agent-context
+version: 0.1.0
+type: hybrid
+targets: [codex, claude]
+includes: auto
+dependencies:
+  apm:
+    - git: https://github.com/flyology-ada/agents.git
+      path: packages/profiles/ada-library
+      ref: main

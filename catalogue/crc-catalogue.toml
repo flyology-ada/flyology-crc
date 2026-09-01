@@ -1,0 +1,502 @@
+schema = 1
+catalogue_source = "https://reveng.sourceforge.io/crc-catalogue/all.htm"
+
+[[algorithm]]
+width = 16
+name = "ARC"
+polynomial = "8005"
+initial = "0000"
+reflected = true
+final_xor = "0000"
+check = "BB3D"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "CDMA2000"
+polynomial = "C867"
+initial = "FFFF"
+reflected = false
+final_xor = "0000"
+check = "4C06"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "CMS"
+polynomial = "8005"
+initial = "FFFF"
+reflected = false
+final_xor = "0000"
+check = "AEE7"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "DDS_110"
+polynomial = "8005"
+initial = "800D"
+reflected = false
+final_xor = "0000"
+check = "9ECF"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "DECT_R"
+polynomial = "0589"
+initial = "0000"
+reflected = false
+final_xor = "0001"
+check = "007E"
+residue = "0589"
+
+[[algorithm]]
+width = 16
+name = "DECT_X"
+polynomial = "0589"
+initial = "0000"
+reflected = false
+final_xor = "0000"
+check = "007F"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "DNP"
+polynomial = "3D65"
+initial = "0000"
+reflected = true
+final_xor = "FFFF"
+check = "EA82"
+residue = "66C5"
+
+[[algorithm]]
+width = 16
+name = "EN_13757"
+polynomial = "3D65"
+initial = "0000"
+reflected = false
+final_xor = "FFFF"
+check = "C2B7"
+residue = "A366"
+
+[[algorithm]]
+width = 16
+name = "GENIBUS"
+polynomial = "1021"
+initial = "FFFF"
+reflected = false
+final_xor = "FFFF"
+check = "D64E"
+residue = "1D0F"
+
+[[algorithm]]
+width = 16
+name = "GSM"
+polynomial = "1021"
+initial = "0000"
+reflected = false
+final_xor = "FFFF"
+check = "CE3C"
+residue = "1D0F"
+
+[[algorithm]]
+width = 16
+name = "IBM_3740"
+polynomial = "1021"
+initial = "FFFF"
+reflected = false
+final_xor = "0000"
+check = "29B1"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "IBM_SDLC"
+polynomial = "1021"
+initial = "FFFF"
+reflected = true
+final_xor = "FFFF"
+check = "906E"
+residue = "F0B8"
+
+[[algorithm]]
+width = 16
+name = "ISO_IEC_14443_3_A"
+polynomial = "1021"
+initial = "C6C6"
+reflected = true
+final_xor = "0000"
+check = "BF05"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "KERMIT"
+polynomial = "1021"
+initial = "0000"
+reflected = true
+final_xor = "0000"
+check = "2189"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "LJ1200"
+polynomial = "6F63"
+initial = "0000"
+reflected = false
+final_xor = "0000"
+check = "BDF4"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "M17"
+polynomial = "5935"
+initial = "FFFF"
+reflected = false
+final_xor = "0000"
+check = "772B"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "MAXIM_DOW"
+polynomial = "8005"
+initial = "0000"
+reflected = true
+final_xor = "FFFF"
+check = "44C2"
+residue = "B001"
+
+[[algorithm]]
+width = 16
+name = "MCRF4XX"
+polynomial = "1021"
+initial = "FFFF"
+reflected = true
+final_xor = "0000"
+check = "6F91"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "MODBUS"
+polynomial = "8005"
+initial = "FFFF"
+reflected = true
+final_xor = "0000"
+check = "4B37"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "NRSC_5"
+polynomial = "080B"
+initial = "FFFF"
+reflected = true
+final_xor = "0000"
+check = "A066"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "OPENSAFETY_A"
+polynomial = "5935"
+initial = "0000"
+reflected = false
+final_xor = "0000"
+check = "5D38"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "OPENSAFETY_B"
+polynomial = "755B"
+initial = "0000"
+reflected = false
+final_xor = "0000"
+check = "20FE"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "PROFIBUS"
+polynomial = "1DCF"
+initial = "FFFF"
+reflected = false
+final_xor = "FFFF"
+check = "A819"
+residue = "E394"
+
+[[algorithm]]
+width = 16
+name = "RIELLO"
+polynomial = "1021"
+initial = "B2AA"
+reflected = true
+final_xor = "0000"
+check = "63D0"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "SPI_FUJITSU"
+polynomial = "1021"
+initial = "1D0F"
+reflected = false
+final_xor = "0000"
+check = "E5CC"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "T10_DIF"
+polynomial = "8BB7"
+initial = "0000"
+reflected = false
+final_xor = "0000"
+check = "D0DB"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "TELEDISK"
+polynomial = "A097"
+initial = "0000"
+reflected = false
+final_xor = "0000"
+check = "0FB3"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "TMS37157"
+polynomial = "1021"
+initial = "89EC"
+reflected = true
+final_xor = "0000"
+check = "26B1"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "UMTS"
+polynomial = "8005"
+initial = "0000"
+reflected = false
+final_xor = "0000"
+check = "FEE8"
+residue = "0000"
+
+[[algorithm]]
+width = 16
+name = "USB"
+polynomial = "8005"
+initial = "FFFF"
+reflected = true
+final_xor = "FFFF"
+check = "B4C8"
+residue = "B001"
+
+[[algorithm]]
+width = 16
+name = "XMODEM"
+polynomial = "1021"
+initial = "0000"
+reflected = false
+final_xor = "0000"
+check = "31C3"
+residue = "0000"
+
+[[algorithm]]
+width = 32
+name = "AIXM"
+polynomial = "814141AB"
+initial = "00000000"
+reflected = false
+final_xor = "00000000"
+check = "3010BF7F"
+residue = "00000000"
+
+[[algorithm]]
+width = 32
+name = "AUTOSAR"
+polynomial = "F4ACFB13"
+initial = "FFFFFFFF"
+reflected = true
+final_xor = "FFFFFFFF"
+check = "1697D06A"
+residue = "904CDDBF"
+
+[[algorithm]]
+width = 32
+name = "BASE91_D"
+polynomial = "A833982B"
+initial = "FFFFFFFF"
+reflected = true
+final_xor = "FFFFFFFF"
+check = "87315576"
+residue = "45270551"
+
+[[algorithm]]
+width = 32
+name = "BZIP2"
+polynomial = "04C11DB7"
+initial = "FFFFFFFF"
+reflected = false
+final_xor = "FFFFFFFF"
+check = "FC891918"
+residue = "C704DD7B"
+
+[[algorithm]]
+width = 32
+name = "CD_ROM_EDC"
+polynomial = "8001801B"
+initial = "00000000"
+reflected = true
+final_xor = "00000000"
+check = "6EC2EDC4"
+residue = "00000000"
+
+[[algorithm]]
+width = 32
+name = "CKSUM"
+polynomial = "04C11DB7"
+initial = "00000000"
+reflected = false
+final_xor = "FFFFFFFF"
+check = "765E7680"
+residue = "C704DD7B"
+
+[[algorithm]]
+width = 32
+name = "ISCSI"
+polynomial = "1EDC6F41"
+initial = "FFFFFFFF"
+reflected = true
+final_xor = "FFFFFFFF"
+check = "E3069283"
+residue = "B798B438"
+
+[[algorithm]]
+width = 32
+name = "ISO_HDLC"
+polynomial = "04C11DB7"
+initial = "FFFFFFFF"
+reflected = true
+final_xor = "FFFFFFFF"
+check = "CBF43926"
+residue = "DEBB20E3"
+
+[[algorithm]]
+width = 32
+name = "JAMCRC"
+polynomial = "04C11DB7"
+initial = "FFFFFFFF"
+reflected = true
+final_xor = "00000000"
+check = "340BC6D9"
+residue = "00000000"
+
+[[algorithm]]
+width = 32
+name = "MEF"
+polynomial = "741B8CD7"
+initial = "FFFFFFFF"
+reflected = true
+final_xor = "00000000"
+check = "D2C22F51"
+residue = "00000000"
+
+[[algorithm]]
+width = 32
+name = "MPEG_2"
+polynomial = "04C11DB7"
+initial = "FFFFFFFF"
+reflected = false
+final_xor = "00000000"
+check = "0376E6E7"
+residue = "00000000"
+
+[[algorithm]]
+width = 32
+name = "XFER"
+polynomial = "000000AF"
+initial = "00000000"
+reflected = false
+final_xor = "00000000"
+check = "BD0BE338"
+residue = "00000000"
+
+[[algorithm]]
+width = 64
+name = "ECMA_182"
+polynomial = "42F0E1EBA9EA3693"
+initial = "0000000000000000"
+reflected = false
+final_xor = "0000000000000000"
+check = "6C40DF5F0B497347"
+residue = "0000000000000000"
+
+[[algorithm]]
+width = 64
+name = "GO_ISO"
+polynomial = "000000000000001B"
+initial = "FFFFFFFFFFFFFFFF"
+reflected = true
+final_xor = "FFFFFFFFFFFFFFFF"
+check = "B90956C775A41001"
+residue = "5300000000000000"
+
+[[algorithm]]
+width = 64
+name = "MS"
+polynomial = "259C84CBA6426349"
+initial = "FFFFFFFFFFFFFFFF"
+reflected = true
+final_xor = "0000000000000000"
+check = "75D4B74F024ECEEA"
+residue = "0000000000000000"
+
+[[algorithm]]
+width = 64
+name = "NVME"
+polynomial = "AD93D23594C93659"
+initial = "FFFFFFFFFFFFFFFF"
+reflected = true
+final_xor = "FFFFFFFFFFFFFFFF"
+check = "AE8B14860A799888"
+residue = "F310303B2B6F6E42"
+
+[[algorithm]]
+width = 64
+name = "REDIS"
+polynomial = "AD93D23594C935A9"
+initial = "0000000000000000"
+reflected = true
+final_xor = "0000000000000000"
+check = "E9C6D914C4B8D9CA"
+residue = "0000000000000000"
+
+[[algorithm]]
+width = 64
+name = "WE"
+polynomial = "42F0E1EBA9EA3693"
+initial = "FFFFFFFFFFFFFFFF"
+reflected = false
+final_xor = "FFFFFFFFFFFFFFFF"
+check = "62EC59E3F1A4F00A"
+residue = "FCACBEBD5931A992"
+
+[[algorithm]]
+width = 64
+name = "XZ"
+polynomial = "42F0E1EBA9EA3693"
+initial = "FFFFFFFFFFFFFFFF"
+reflected = true
+final_xor = "FFFFFFFFFFFFFFFF"
+check = "995DC9BBDF1939FA"
+residue = "49958C9ABD7D353F"

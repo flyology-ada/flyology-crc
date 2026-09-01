@@ -1,0 +1,11 @@
+project GNATdoc is
+   for Languages use ("Ada");
+   for Source_Dirs use ("staging");
+   for Source_Files use
+     ("flyology_crc.ads",
+      "flyology_crc-width_16.ads",
+      "flyology_crc-width_32.ads",
+      "flyology_crc-width_64.ads");
+   for Object_Dir use "obj";
+   for Create_Missing_Dirs use "True";
+end GNATdoc;

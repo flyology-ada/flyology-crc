@@ -1,0 +1,21 @@
+**/alire/
+/.alire/
+**/bin/
+**/lib/
+**/config/
+**/obj/
+**/build/
+**/target/
+.DS_Store
+benchmarks/results/
+/docs/api/
+/docs/gnatdoc/html/
+/docs/gnatdoc/staging/
+/.agents/
+/.claude/rules/
+/.claude/skills/
+/apm_modules/
+
+
+# APM dependencies
+apm_modules/

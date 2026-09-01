@@ -1,0 +1,53 @@
+with "../flyology_crc.gpr";
+
+project Flyology_CRC_Tests is
+   Architecture := external ("FLYOLOGY_CRC_ARCH", "scalar");
+   Host_OS := external ("FLYOLOGY_CRC_HOST_OS", "unsupported");
+
+   Oracle_Library :=
+     Project'Project_Dir & "../oracle/rust/target/release/libflyology_crc_fast_oracle.a";
+   Oracle_System_Libraries :=
+     external_as_list ("FLYOLOGY_CRC_ORACLE_SYSTEM_LIBRARIES", " ");
+
+   for Source_Dirs use ("src", "../oracle/ada");
+   for Object_Dir use "obj/" & Architecture & "/" & Host_OS;
+   for Exec_Dir use "bin/" & Architecture & "/" & Host_OS;
+   for Main use
+     ("flyology_crc_tests.adb", "rust_oracle_tests.adb",
+      "flyology_crc-native-primitive_tests.adb",
+      "flyology_crc-native-pmull_engine_test_main.adb",
+      "flyology_crc-crc32c_pmull_v12e_v1-test_main.adb",
+      "flyology_crc-crc32_iso_hdlc_pmull_v12e_v1_tests.adb",
+      "flyology_crc-crc32c_pmull_eor3_v9s3x2e_s3-test_main.adb",
+      "flyology_crc-crc32_iso_hdlc_pmull_eor3_v9s3x2e_s3_tests.adb",
+      "flyology_crc-crc32_aarch64_small-test_main.adb",
+      "flyology_crc-x86_feature_decode_tests.adb",
+      "flyology_crc-crc32c_x86_small-test_main.adb",
+      "flyology_crc-crc32c_x86_sse_v4s3x3-test_main.adb",
+      "flyology_crc-crc32c_x86_avx512_pclmul_v4s3x3-test_main.adb",
+      "flyology_crc-crc32c_x86_avx512_vpclmul_v3x2-test_main.adb",
+      "flyology_crc-generic_sse-test_main.adb",
+      "flyology_crc-generic_avx512_ternary-test_main.adb",
+      "flyology_crc-generic_avx512_vpclmul-test_main.adb");
+   for Create_Missing_Dirs use "True";
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        ("-O2", "-gnat2022", "-gnatwa", "-gnatwJ", "-gnatVa", "-gnatyM110");
+   end Compiler;
+
+   package Linker is
+      for Switches ("rust_oracle_tests.adb") use
+        (Oracle_Library) & Oracle_System_Libraries;
+      for Switches ("flyology_crc-crc32c_pmull_v12e_v1-test_main.adb") use
+        (Oracle_Library) & Oracle_System_Libraries;
+      for Switches ("flyology_crc-crc32_iso_hdlc_pmull_v12e_v1_tests.adb") use
+        (Oracle_Library) & Oracle_System_Libraries;
+      for Switches ("flyology_crc-crc32c_pmull_eor3_v9s3x2e_s3-test_main.adb") use
+        (Oracle_Library) & Oracle_System_Libraries;
+      for Switches ("flyology_crc-crc32_iso_hdlc_pmull_eor3_v9s3x2e_s3_tests.adb") use
+        (Oracle_Library) & Oracle_System_Libraries;
+      for Switches ("flyology_crc-crc32_aarch64_small-test_main.adb") use
+        (Oracle_Library) & Oracle_System_Libraries;
+   end Linker;
+end Flyology_CRC_Tests;

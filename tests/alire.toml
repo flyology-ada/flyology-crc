@@ -1,0 +1,32 @@
+name = "flyology_crc_tests"
+description = "Tests for flyology_crc"
+version = "0.1.0-dev"
+licenses = "MIT OR Apache-2.0"
+executables = [
+  "flyology_crc_tests",
+  "rust_oracle_tests",
+  "flyology_crc-native-primitive_tests",
+  "flyology_crc-native-pmull_engine_test_main",
+  "flyology_crc-crc32c_pmull_v12e_v1-test_main",
+  "flyology_crc-crc32_iso_hdlc_pmull_v12e_v1_tests",
+  "flyology_crc-crc32c_pmull_eor3_v9s3x2e_s3-test_main",
+  "flyology_crc-crc32_iso_hdlc_pmull_eor3_v9s3x2e_s3_tests",
+  "flyology_crc-crc32_aarch64_small-test_main",
+  "flyology_crc-x86_feature_decode_tests",
+  "flyology_crc-crc32c_x86_small-test_main",
+  "flyology_crc-crc32c_x86_sse_v4s3x3-test_main",
+  "flyology_crc-crc32c_x86_avx512_pclmul_v4s3x3-test_main",
+  "flyology_crc-crc32c_x86_avx512_vpclmul_v3x2-test_main",
+  "flyology_crc-generic_sse-test_main",
+  "flyology_crc-generic_avx512_ternary-test_main",
+  "flyology_crc-generic_avx512_vpclmul-test_main",
+]
+
+[[depends-on]]
+gnat = ">=13 & <17"
+
+[[depends-on]]
+flyology_crc = "*"
+
+[[pins]]
+flyology_crc = { path = ".." }

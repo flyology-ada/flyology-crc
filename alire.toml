@@ -1,0 +1,18 @@
+name = "flyology_crc"
+description = "Fast CRC-16, CRC-32, and CRC-64 algorithms for Ada"
+version = "0.1.0-dev"
+
+licenses = "MIT OR Apache-2.0"
+tags = ["ada", "crc", "checksum", "simd"]
+project-files = ["flyology_crc.gpr"]
+
+[gpr-set-externals.'case(host-arch)']
+aarch64 = { FLYOLOGY_CRC_ARCH = "aarch64" }
+x86-64 = { FLYOLOGY_CRC_ARCH = "x86_64" }
+
+[gpr-set-externals.'case(os)']
+macos = { FLYOLOGY_CRC_HOST_OS = "macos" }
+linux = { FLYOLOGY_CRC_HOST_OS = "linux" }
+
+[[depends-on]]
+gnat = ">=13 & <17"
