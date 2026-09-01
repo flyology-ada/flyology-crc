@@ -83,23 +83,8 @@ jobs:
           diff -u base-symbols.txt candidate-symbols.txt || true
           diff -u base-disassembly.txt candidate-disassembly.txt || true
 
-          for section in .text .rela.text .data .rodata .eh_frame .rela.eh_frame; do
-            section_name=${section#.}
-            objcopy --dump-section "$section=base-$section_name.bin" \
-              base-object.o
-            objcopy --dump-section "$section=candidate-$section_name.bin" \
-              candidate-object.o
-            test -s "base-$section_name.bin"
-            test -s "candidate-$section_name.bin"
-            sha256sum "base-$section_name.bin" "candidate-$section_name.bin"
-            cmp "base-$section_name.bin" "candidate-$section_name.bin"
-          done
-
           test -s base-symbols.txt
           test -s candidate-symbols.txt
           test -s base-disassembly.txt
           test -s candidate-disassembly.txt
-          sha256sum base-symbols.txt candidate-symbols.txt
-          sha256sum base-disassembly.txt candidate-disassembly.txt
-          cmp base-symbols.txt candidate-symbols.txt
-          cmp base-disassembly.txt candidate-disassembly.txt
+          cmp base-object.o candidate-object.o
