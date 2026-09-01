@@ -1,0 +1,73 @@
+name: Compare x86 code generation
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_sha:
+        description: Exact lowercase 40-hex base commit SHA
+        required: true
+        type: string
+      candidate_sha:
+        description: Exact lowercase 40-hex candidate commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  compare-vpclmul-object:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out base source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.base_sha }}
+          path: base
+          persist-credentials: false
+      - name: Check out candidate source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          path: candidate
+          persist-credentials: false
+      - uses: alire-project/setup-alire@fc4c8ce471aa30b3af0d39ce15add1ee9eaf28f2 # v6.0.0
+      - name: Select verified Ada toolchain
+        run: alr toolchain --select gnat_native=16.1.0 gprbuild=26.0.1
+      - name: Compare warning and machine-code behavior
+        shell: bash
+        env:
+          BASE_REF: ${{ inputs.base_sha }}
+          CANDIDATE_REF: ${{ inputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$BASE_REF" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$CANDIDATE_REF" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git -C base rev-parse HEAD)" = "$BASE_REF"
+          test "$(git -C candidate rev-parse HEAD)" = "$CANDIDATE_REF"
+          printf 'base=%s\ncandidate=%s\n' "$BASE_REF" "$CANDIDATE_REF"
+
+          alr -C base build --release -- \
+            -f -XFLYOLOGY_CRC_ARCH=x86_64 -XFLYOLOGY_CRC_HOST_OS=linux \
+            -cargs:Ada -gnatwa 2>&1 | tee base-build.log
+          test "$(grep -c 'code statement with no inputs should usually be Volatile' base-build.log)" -eq 1
+          test "$(grep -c 'warning:' base-build.log)" -eq 1
+
+          alr -C candidate build --release -- \
+            -f -XFLYOLOGY_CRC_ARCH=x86_64 -XFLYOLOGY_CRC_HOST_OS=linux \
+            -cargs:Ada -gnatwa 2>&1 | tee candidate-build.log
+          test "$(grep -c 'warning:' candidate-build.log || true)" -eq 0
+
+          object=flyology_crc-crc32c_x86_avx512_vpclmul_v3x2.o
+          test -s "base/obj/x86_64/linux/$object"
+          test -s "candidate/obj/x86_64/linux/$object"
+          sha256sum \
+            "base/obj/x86_64/linux/$object" \
+            "candidate/obj/x86_64/linux/$object"
+          cmp \
+            "base/obj/x86_64/linux/$object" \
+            "candidate/obj/x86_64/linux/$object"
+
+          alr -C candidate build --release -- \
+            -f -XFLYOLOGY_CRC_ARCH=x86_64 -XFLYOLOGY_CRC_HOST_OS=linux \
+            -cargs:Ada -gnatwa -gnatwe
