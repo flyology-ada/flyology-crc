@@ -13,8 +13,8 @@ private package Flyology_CRC.Native.Generic_PMULL is
       with
         Pre =>
           Width in 16 | 32 | 64
-          and then Data'Length >= 128
-          and then Data'Length mod 128 = 0
+          and then Data'Length >= 16
+          and then Data'Length mod 16 = 0
           and then Compiled
           and then Native_Features.PMULL_Available;
       --  State is the raw algorithm-form register, before Final_XOR.  In

@@ -222,6 +222,52 @@ package body Flyology_CRC.Generic_PMULL_Kernel is
       return (if Reflected then Loaded else Reverse_Bytes_128 (Loaded));
    end Load_Data;
 
+   procedure Fold_Blocks
+     (Result      : in out Vector;
+      Reflected   : Boolean;
+      Keys        : Folding_Keys;
+      From        : System.Address;
+      End_Address : System.Address)
+   with Inline_Always
+   is
+      --  Keys (1) and Keys (2) are the x^128 and x^192 pair the eight-lane
+      --  collapse uses for its 16-byte distance, so each iteration advances the
+      --  single accumulated register by exactly one block.
+      Coeff         : constant Vector :=
+        Coefficient (Keys (2), Keys (1), Reflected);
+      Block_Address : System.Address := From;
+   begin
+      while Block_Address /= End_Address loop
+         Result :=
+           Fold_16
+             (Result, Coeff, Load_Data (Block_Address, Reflected), Reflected);
+         Block_Address := Block_Address + 16;
+      end loop;
+   end Fold_Blocks;
+
+   function Update_Short_Blocks
+     (State                     : Value;
+      Reflected                 : Boolean;
+      Keys                      : Folding_Keys;
+      Base_Address, End_Address : System.Address) return Value
+   with Inline_Always
+   is
+      --  Fewer than eight blocks cannot fill a stripe, so seed one accumulator
+      --  from the first block and fold the rest into it.  The eight-lane
+      --  collapse performs the same sequence of 16-byte folds, so this is the
+      --  identical GF(2) reduction expressed without the lane split.
+      Result : Vector :=
+        Xor_128
+          (Load_Data (Base_Address, Reflected),
+           Initial_Vector (State, Reflected));
+   begin
+      Fold_Blocks (Result, Reflected, Keys, Base_Address + 16, End_Address);
+      return
+        (if Width <= 32
+         then Final_32 (Result, Reflected, Keys)
+         else Final_64 (Result, Reflected, Keys));
+   end Update_Short_Blocks;
+
    function Update_1024_Reflected
      (State  : Value;
       Keys   : Folding_Keys;
@@ -320,16 +366,26 @@ package body Flyology_CRC.Generic_PMULL_Kernel is
       First_Data  : Vector;
       Second_Data : Vector;
       Result : Vector;
-      --  The generic precondition establishes one or more complete 128-byte
-      --  stripes.  Derive the base through a checked Ada index once, then
-      --  traverse only addresses proven to belong to those complete stripes;
-      --  the final post-index update reaches End_Address and is not read.
+      --  The generic precondition establishes whole 16-byte blocks.  Derive
+      --  the base through a checked Ada index once, then traverse only
+      --  addresses proven to belong to that input; the final post-index update
+      --  reaches End_Address and is not read.
       Base_Address : constant System.Address := Data (Data'First)'Address;
       End_Address : constant System.Address :=
         Base_Address + System.Storage_Elements.Storage_Offset (Data'Length);
+      Stripe_End_Address : constant System.Address :=
+        Base_Address
+        + System.Storage_Elements.Storage_Offset
+            (Data'Length - Data'Length mod 128);
       Stripe_Address : System.Address := Base_Address + 128;
       Coeff  : constant Vector := Coefficient (Keys (4), Keys (3), Reflected);
    begin
+      if Data'Length < 128 then
+         return
+           Update_Short_Blocks
+             (State, Reflected, Keys, Base_Address, End_Address);
+      end if;
+
       if Use_Custom_Initial_Load then
          Load_Initial_Stripe_8
            (Base_Address, X0, X1, X2, X3, X4, X5, X6, X7);
@@ -361,13 +417,13 @@ package body Flyology_CRC.Generic_PMULL_Kernel is
       if Use_Custom_Stripe_Loop
         or else (Use_Custom_Forward_Stripe_Loop and then not Reflected)
       then
-         if Stripe_Address /= End_Address then
+         if Stripe_Address /= Stripe_End_Address then
             Fold_Stripes_8
-              (Stripe_Address, End_Address, Reflected, Coeff,
+              (Stripe_Address, Stripe_End_Address, Reflected, Coeff,
                X0, X1, X2, X3, X4, X5, X6, X7);
          end if;
       else
-         while Stripe_Address /= End_Address loop
+         while Stripe_Address /= Stripe_End_Address loop
             Load_16_Pair_Advance (Stripe_Address, First_Data, Second_Data);
             X0 :=
               Fold_16
@@ -461,6 +517,11 @@ package body Flyology_CRC.Generic_PMULL_Kernel is
            Fold_16
              (X6, Coefficient (Keys (2), Keys (1), Reflected), Result,
               Reflected);
+      end if;
+
+      --  Consume the whole 16-byte blocks that follow the complete stripes.
+      if Stripe_End_Address /= End_Address then
+         Fold_Blocks (Result, Reflected, Keys, Stripe_End_Address, End_Address);
       end if;
 
       return

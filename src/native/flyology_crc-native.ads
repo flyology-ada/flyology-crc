@@ -45,21 +45,21 @@ private package Flyology_CRC.Native is
       Reflected : Boolean;
       Keys      : Folding_Keys;
       Data      : Byte_Array) return Interfaces.Unsigned_16
-   with Pre => Data'Length >= 128 and then Data'Length mod 128 = 0;
+   with Pre => Data'Length >= 16 and then Data'Length mod 16 = 0;
 
    function Update_PMULL_32
      (State     : Interfaces.Unsigned_32;
       Reflected : Boolean;
       Keys      : Folding_Keys;
       Data      : Byte_Array) return Interfaces.Unsigned_32
-   with Pre => Data'Length >= 128 and then Data'Length mod 128 = 0;
+   with Pre => Data'Length >= 16 and then Data'Length mod 16 = 0;
 
    function Update_PMULL_64
      (State     : Interfaces.Unsigned_64;
       Reflected : Boolean;
       Keys      : Folding_Keys;
       Data      : Byte_Array) return Interfaces.Unsigned_64
-   with Pre => Data'Length >= 128 and then Data'Length mod 128 = 0;
+   with Pre => Data'Length >= 16 and then Data'Length mod 16 = 0;
 
    function Update_PMULL_64_1024_Reflected
      (State  : Interfaces.Unsigned_64;
@@ -71,5 +71,7 @@ private package Flyology_CRC.Native is
    --  public Byte_Array contract has established that geometry.
    --  These width-specific entry points are the only batch boundary into the
    --  selected +aes leaf.  Callers must first establish PMULL_Available.  State
-   --  is the raw algorithm-form register before Final_XOR.
+   --  is the raw algorithm-form register before Final_XOR.  Data is any whole
+   --  number of 16-byte blocks: complete 128-byte stripes take the eight-lane
+   --  fold and every other block is folded one at a time.
 end Flyology_CRC.Native;

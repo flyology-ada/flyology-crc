@@ -69,12 +69,17 @@ private package Flyology_CRC.Generic_PMULL_Kernel is
       with
         Pre =>
           Width in 16 | 32 | 64
-          and then Data'Length >= 128
-          and then Data'Length mod 128 = 0;
+          and then Data'Length >= 16
+          and then Data'Length mod 16 = 0;
       --  State is the raw algorithm-form register, before Final_XOR.  In
       --  particular, a reflected CRC-16 initial value has already been bit
       --  reversed by Generic_Core.Create; CRC-32 and CRC-64 values have not.
-      --  Data contains one or more complete 128-byte stripes.  Both load
+      --  Data contains any whole number of 16-byte blocks.  Complete 128-byte
+      --  stripes go through the eight-lane fold; the blocks that remain, and
+      --  every block of an input shorter than one stripe, are folded one at a
+      --  time at the 16-byte distance before the width reduction.  A caller
+      --  observes the same value it would obtain by running those bytes
+      --  through the byte core instead.  Both load
       --  operations are unaligned, so no address-alignment promise is required
       --  from the caller.  Load_16_Pair_Advance is supplied by the selected
       --  architecture leaf so this generic unit contains no native instructions.

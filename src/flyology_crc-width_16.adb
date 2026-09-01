@@ -18,19 +18,29 @@ package body Flyology_CRC.Width_16 is
       Data          : Byte_Array)
    with Inline_Always
    is
+      X86_Leaf_Selected : constant Boolean :=
+        X86_Features.AVX512_VPCLMUL_Available
+        or else X86_Features.AVX512_Ternary_Available
+        or else X86_Features.Generic_SSE_Available;
+      --  The x86 leaves are hand-written 128-byte stripe kernels.  The AArch64
+      --  PMULL leaves fold whole 16-byte blocks as well, so they accept a
+      --  shorter input, take a longer prefix, and leave a shorter suffix.
+      Fold_Granularity : constant Ada.Streams.Stream_Element_Offset :=
+        (if X86_Leaf_Selected then 128 else 16);
    begin
-      if Data'Length >= 128
-        and then
-          (X86_Features.AVX512_VPCLMUL_Available
-           or else X86_Features.AVX512_Ternary_Available
-           or else X86_Features.Generic_SSE_Available
-           or else Native_Features.PMULL_Available)
+      if Data'Length >= Fold_Granularity
+        and then (X86_Leaf_Selected or else Native_Features.PMULL_Available)
       then
-         --  Native loads are unaligned, so the maximal complete-stripe prefix
-         --  can be folded directly and only the suffix needs the table core.
+         --  Native loads are unaligned, so the maximal foldable prefix can be
+         --  folded directly and only the suffix needs the table core.
          declare
+            --  Each arm divides by a static power of two, so neither the
+            --  x86 nor the AArch64 dispatch pays for a runtime division.
             Folded_Length : constant Ada.Streams.Stream_Element_Offset :=
-              Ada.Streams.Stream_Element_Offset (Data'Length - Data'Length mod 128);
+              Ada.Streams.Stream_Element_Offset (Data'Length)
+              - (if X86_Leaf_Selected
+                 then Data'Length mod 128
+                 else Data'Length mod 16);
             Folded_Last : constant Ada.Streams.Stream_Element_Offset :=
               Data'First + (Folded_Length - 1);
             Folded : Byte_Array renames Data (Data'First .. Folded_Last);
